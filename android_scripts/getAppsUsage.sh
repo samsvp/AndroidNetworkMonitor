@@ -13,7 +13,8 @@ function getAppsUsage()
 
 	pat=$(echo ${ADDR[@]}|tr " " "|") # uids to search for while reading the stats file
 
-	for bytes in $(adb shell cat /proc/net/xt_qtaguid/stats | grep -E "${pat}" | awk '{print  $4 ";" $6 + $8}');
+	# /proc/net/xt_qtaguid/stats is the file where network usage data is stored
+	for bytes in $(cat /proc/net/xt_qtaguid/stats | grep -E "${pat}" | awk '{print  $4 ";" $6 + $8}');
 	do
 		# get the uids and corresponding bytes
 		IFS=";" read -ra arr <<<"$bytes"
