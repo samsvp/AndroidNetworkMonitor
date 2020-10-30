@@ -42,5 +42,5 @@ for IP in $(cat IPs.txt); do
     adb -s $android_IP push android_scripts/apps.txt /sdcard/android_net_monitor/
 
     # start monitoring
-    adb -s $android_IP shell "sh /sdcard/android_net_monitor/appsUsageMonitor.sh"
+    ./start.exp
 done;

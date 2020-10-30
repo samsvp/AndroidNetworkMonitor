@@ -1,0 +1,8 @@
+#!/usr/bin/env expect
+spawn adb shell
+expect "\$ "
+send "nohup sh /sdcard/android_net_monitor/appsUsageMonitor.sh 2>/dev/null 1>/dev/null &"
+send "\r"
+send "exit"
+send "\r"
+expect eof
