@@ -3,22 +3,37 @@
 # Usage: ./getAppsUID.sh "app1;app2;..."
 
 function getAppsUID()
-{
-    if [ -f UIDs.txt ]; then
-        rm UIDs.txt
+{    
+    if [ -f android_scripts/UIDs.txt ]; then
+        rm android_scripts/UIDs.txt
     fi
-    
-    # apps to search for while reading the stats file
-    IFS=";" read -ra ADDR <<<"$1"
-	apps=$(echo ${ADDR[@]}|tr " " "|") # uids to search for while reading the stats file
 
-    for package in $(pm list packages | grep -E "${apps}" | cut -f2 -d":");
+    # apps to search for while reading the stats file
+    _apps=$(cat android_scripts/apps.txt)
+    echo $_apps
+    apps=$(echo $_apps | tr ";" "|") # uids to search for while reading the stats file
+
+    if [[ $apps == *"|" ]]; then
+        apps=${apps%?}
+    fi
+
+    echo $apps >> debug.txt
+
+    for package in $(adb shell pm list packages | grep -E "${apps}" | cut -f2 -d":");
 	do
         pkg=`echo $package | sed 's/\\r//g'` # remove \r\n line ending
-        uid=$(dumpsys package $pkg | grep userId= | cut -f2 -d"=")";"
-        echo -n `echo $uid | sed 's/\\r//g'` >> UIDs.txt
+        uid=$(adb shell dumpsys package $pkg | grep userId= | cut -f2 -d"=")"|"
+        
+        echo $pkg $uid >> debug.txt
+         # the user ID might be returned more than once for some apps
+        if [[ $(echo $uid) == *" "* ]]; then
+            uid=$(echo $uid | cut -f1 -d" ")"|"
+            echo "new uid:" $uid >> debug.txt
+        fi
+        
+        echo -n `echo $uid | sed 's/\\r//g'` >> android_scripts/UIDs.txt
     done;
-    cat UIDs.txt
+    truncate -s-1 android_scripts/UIDs.txt # remove the last char
 };
 
-getAppsUID $1
+getAppsUID

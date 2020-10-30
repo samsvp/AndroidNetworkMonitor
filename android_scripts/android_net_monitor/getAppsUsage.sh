@@ -1,25 +1,22 @@
 #!/bin/bash
 # Get android app network usage statistics.
 # Usage: ./getAppsUsage.sh "uid1;uid2;..."
+
 function getAppsUsage()
 {
-	# create a dictionary with uids
-	declare -A uids
+	pat=$(cat /sdcard/android_net_monitor/UIDs.txt) # uids to search for while reading the stats file
 
-	IFS=";" read -ra ADDR <<<"$1"
-	for i in "${ADDR[@]}"; do
+	for i in $(echo $pat | tr '|' '\n'); do
 		uids[$i]=0
 	done
 
-	pat=$(echo ${ADDR[@]}|tr " " "|") # uids to search for while reading the stats file
-
 	# /proc/net/xt_qtaguid/stats is the file where network usage data is stored
-	for bytes in $(cat /proc/net/xt_qtaguid/stats | grep -E "${pat}" | awk '{print  $4 ";" $6 + $8}');
+	for bytes in $(cat /proc/net/xt_qtaguid/stats | grep -E "${pat}" | 
+				   cut -d " " -f 4,6,8| tr ' ' ';');
 	do
 		# get the uids and corresponding bytes
-		IFS=";" read -ra arr <<<"$bytes"
-		uid=${arr[0]}
-		b=${arr[1]}
+		IFS=";" read uid rx tx <<< "$bytes"
+		b=$((rx + tx)) # total bytes sent and received
 		uids[$uid]=$((uids[$uid] + $b))
 	done;
 
