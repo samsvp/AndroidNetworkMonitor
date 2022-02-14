@@ -5,10 +5,11 @@ Collection of scripts to monitor Android apps network usage with data.
 Linux:
 ```
 sudo apt install adb
+sudo apt install expect
 ```
 
 Windows:
-Download and install ADB and Cygwin.
+Download and install ADB and Cygwin. The setup script will need to be done manually.
 
 ## Usage
 Create a file named "IPs.txt" containing the list of android IPs you wish to connect to.
@@ -18,7 +19,7 @@ E.g.
 192.168.0.125
 ```
 
-Then create a file named "apps.txt" containing the list of the name of the android apps you wish to monitor.
+Then create a file named "android_scripts/apps.txt" containing the list of the name of the android apps you wish to monitor.
 The apps name must end with a semicolon and the file must have only one line.
 E.g.
 ```
